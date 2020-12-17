@@ -1,0 +1,38 @@
+#!/usr/bin/awk -f
+# Outputs a undirected copy the graph with self-loops removed
+# Usage: sanitize <input leda graph>
+# Writes output to standard out
+
+BEGIN {
+  ORS = "\n";
+  pastnodes = 0;
+  numEdges = 0;
+  print "LEDA.GRAPH";
+  print "string";
+  print "short";
+}
+
+# Probably done to prevent # of edges from being printed from
+# original gw file because it may be reduced after self-loops are removed
+/^[0-9]+/ && pastnodes == 0 { print $1; next; }
+# Done to print the type of graph if supplied
+/^-[12]/ { print $1; next; }
+/^\|\{.*\}\|/ { print $0; pastnodes = 1; next; }
+/^[0-9]+ [0-9]+ / {
+  if($1 == $2) next;
+  if($1 < $2) { a = $1; b = $2; }
+  if($1 > $2) { a = $2; b = $1; }
+  if( edges[a " " b] ) { # Should use 'in', but Solaris awk doesn't have it
+  } else {
+    edges[a " " b] = $0;
+    numEdges++;
+  }
+}
+
+END {
+  if(pastnodes == 0) { exit 1; }
+  print numEdges;
+  for(edge in edges) {
+    print edges[edge];
+  }
+}
