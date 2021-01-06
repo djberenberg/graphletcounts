@@ -1,8 +1,11 @@
 # graphletcounts
 Wrappers and scripts for counting (protein structure) graphlets. For calculating graphlets at scale, we have been parallelizing via DisBatch.
 
-# Dependencies
-- numpy, networkx, torch
+# Installation
+```bash
+git clone https://github.com/djberenberg/graphletcounts
+pip install numpy scipy networkx torch
+```
 
 # Scripts
 - `compute_orca_graphlets.py` - runs ORCA, calculates global graphlets up to a certain (fixed) size, which can be found in the file.
