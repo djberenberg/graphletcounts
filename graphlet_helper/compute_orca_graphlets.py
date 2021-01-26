@@ -134,7 +134,6 @@ if __name__ == "__main__":
 
     orca = ORCARunner(args.threshold)
 
-    timer = Timer().start()
     print("[I] Running ORCA", end='...')
     result = orca.run(args.input_pt)
     print("DONE")
