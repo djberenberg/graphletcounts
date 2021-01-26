@@ -110,9 +110,8 @@ class Composer(object):
 
 class AdjacencyMatrixMaker(object):
     """Converts a distance map to an adjacency matrix"""
-    def __init__(self, threshold, weighted=False, selfloop=True):
+    def __init__(self, threshold, selfloop=True):
         self._threshold = threshold
-        self._weighted  = weighted
         self._selfloop  = selfloop
 
     @property
@@ -125,24 +124,36 @@ class AdjacencyMatrixMaker(object):
 
     def convert(self, distance_map):
         A = distance_map.clone()
-        A[A <= 0] = MISSING_RESIDUE
-        A[torch.isnan(A)] = MISSING_RESIDUE
-
-        if not self._weighted:
-            A[ A <= self._threshold] = -1.
-            A[ A > self._threshold ]= 0.
-            A = torch.abs(A)
-            A = A - torch.diag(torch.diagonal(A))
-            if self._selfloop:
-                A = A + torch.eye(A.shape[1])
-        else:
-            A[ A > self._threshold ] = 0.
-        
+        A = ( A <= self._threshold ).float()
         return A
 
     def __call__(self, distance_map):
         return self.convert(distance_map)
 
+class CoordLoader(object):
+    """
+    Converts an N x 3 matrix to an distance matrix
+    """
+    def __init__(self, silent_if_square=True):
+        """
+        initialize
+        args:
+            :silent_if_square (bool) - do nothing if the input matrix is already square
+        """
+        self.silent_if_square = silent_if_square
+
+    def convert(self, coordmat):
+        shape = coordmat.shape
+        assert len(shape) == 2 
+        
+        if (shape[0] == shape[1]) and self.silent_if_square:
+            return coordmat # do nothing when the input is already a square matrix
+        else:
+            assert shape[1] == 3
+            return torch.cdist(coords, coords, p=2)
+
+    def __call__(self, coords):
+        return self.convert(coords)
 
 if __name__ == '__main__':
     pass

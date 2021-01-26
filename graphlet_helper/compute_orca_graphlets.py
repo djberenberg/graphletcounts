@@ -7,7 +7,6 @@ Compute (global) graphlet counts for a thresholded distance map.
 
 import shlex
 import tempfile
-import argparse
 import subprocess
 from pathlib import Path
 
@@ -15,7 +14,7 @@ import torch
 import numpy as np
 import networkx as nx
 
-from toolbox import Composer, Timer, AdjacencyMatrixMaker
+from .toolbox import Composer, Timer, AdjacencyMatrixMaker, CoordLoader
 
 BIN = Path(__file__).resolve().absolute().parent / "bin"
 assert BIN.exists(), "Script not located at same level as ORCA bin/ directory"
@@ -64,13 +63,6 @@ def count_graphlets(gdv):
     return np.asarray(counts, dtype=np.int)
 
 
-def arguments():
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("input_pt", type=Path, help="Input PyTorch tensor file.")
-    parser.add_argument("output_npz", type=Path, help="Output NPZ file path")
-    parser.add_argument("-t", "--threshold", dest="threshold", type=float, default=6.)
-
-    return parser.parse_args()
 
 
 def to_numpy(tensor):
@@ -94,6 +86,7 @@ class ORCARunner(object):
     def __init__(self, threshold=6):
         self.threshold = threshold
         self.as_graph  = Composer(torch.load,
+                                  CoordLoader(silent_if_square=True),
                                   AdjacencyMatrixMaker(self.threshold, selfloop=False),
                                   to_numpy,
                                   nx.from_numpy_matrix)
@@ -122,25 +115,30 @@ class ORCARunner(object):
             normed_gdv = graph_gdv / graph_gdv.sum()
 
             graph_gdvs = np.concatenate([graph_gdv[None, :], normed_gdv[None, :]]) 
-
-        return dict(node_GDV=node_gdv, graph_gdvs=graph_gdvs, channels=['raw', 'normed'])
+        
+        return dict(channels=['raw', 'normed'], mat=graph_gdvs, protein=pdb_id)
 
     def __str__(self):
         return f"{self.__class__.__name__}({self.threshold})"
 
 
 if __name__ == "__main__":
-    args = arguments()
+    import argparse
+
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("input_pt", type=Path, help="Input PyTorch tensor file.")
+    parser.add_argument("output_npz", type=Path, help="Output NPZ file path")
+    parser.add_argument("-t", "--threshold", dest="threshold", type=float, default=6.)
+
+    args = parser.parse_args()
 
     orca = ORCARunner(args.threshold)
 
     timer = Timer().start()
     print("[I] Running ORCA", end='...')
     result = orca.run(args.input_pt)
-    print(f"DONE ({timer.stop().elapsed_time})")
-    result['timing'] = (timer.start_time, timer.stop_time, timer.elapsed_time)
+    print("DONE")
    
-    timer = Timer().start()
     print(f"Saving {result} to {args.output_npz}", end='...')
     np.savez_compressed(args.output_npz, **result)
-    print(f"DONE ({timer.stop().elapsed_time})")
+    print("DONE")

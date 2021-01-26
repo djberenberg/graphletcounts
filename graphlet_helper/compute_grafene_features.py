@@ -21,7 +21,6 @@ This script modifies that routine to do the following:
 
 import site
 import shlex
-import argparse
 import tempfile
 import subprocess
 from pathlib import Path
@@ -29,9 +28,7 @@ from pathlib import Path
 import torch
 import numpy as np
 
-site.addsitedir(Path(__file__).resolve().absolute().parent.parent)
-
-from toolbox import Composer, Timer, AdjacencyMatrixMaker
+from .toolbox import Composer, Timer, AdjacencyMatrixMaker, CoordLoader
 
 psn_approach = "NormOrderedGraphlet-3-4".casefold()
 threshold = "6A"
@@ -39,15 +36,6 @@ threshold = "6A"
 BIN = Path(__file__).resolve().absolute().parent / "bin"
 assert BIN.exists(), "Script not located at same level as GRAFENE bin/ directory"
 
-def arguments():
-    parser = argparse.ArgumentParser(description="Compute NormOrderedGraphlet-3-4 features")
-    parser.add_argument("input_pt", type=check_exists,
-                        help="Input distance map")
-    parser.add_argument("output_npz", type=Path,
-                        help="Output features")
-    parser.add_argument("-t","--threshold", type=int,
-                        help="Contact map threshold", default=6, dest='threshold')
-    return parser.parse_args()
 
 def check_exists(filename):
     filename = Path(filename)
@@ -89,6 +77,7 @@ class GRAFENERunner(object):
     def __init__(self, threshold=6):
         self.threshold = threshold
         self.as_adjmat  = Composer(torch.load,
+                                   CoordLoader(silent_if_square=True),
                                    AdjacencyMatrixMaker(self.threshold, selfloop=False))
         
         self.bindir = BIN
@@ -138,24 +127,29 @@ class GRAFENERunner(object):
 
         timer.stop()
         return dict(channels=['raw', 'normed'],
-                    graph_gdvs=np.concatenate([padded[None, :], normed_vector[None, :]]),
-                    length=int(A.shape[0]),
-                    timing=(timer.start_time,
-                            timer.stop_time,
-                            timer.elapsed_time)
+                    mat=np.concatenate([padded[None, ...], normed_vectors[None, ...]]),
+                    protein=stem,
                     )
 
     def __str__(self):
         return f"{self.__class__.__name__}({self.threshold})"
 
 if __name__ == '__main__':
-    args = arguments()
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Compute NormOrderedGraphlet-3-4 features")
+    parser.add_argument("input_pt", type=check_exists,
+                        help="Input distance map")
+    parser.add_argument("output_npz", type=Path,
+                        help="Output features")
+    parser.add_argument("-t","--threshold", type=int,
+                        help="Contact map threshold", default=6, dest='threshold')
+
+    args = parser.parse_args()
     
     # runs GRAFENE wrapper 
     runner = GRAFENERunner(args.threshold)
     result = runner.run(args.input_pt)
 
-    elapsed = result['timing'][2]
-    
-    print(f"Finished {args.input_pt} in {elapsed} ({result['graph_gdvs'].shape})")
+    print(f"Finished {args.input_pt} in {resul['mat'].shape}")
     np.savez_compressed(args.output_npz, **result)

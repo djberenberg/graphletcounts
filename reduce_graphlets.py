@@ -10,13 +10,13 @@ import argparse
 from pathlib import Path
 import numpy as np
 
-from toolbox import listfile
+from graphlet_helper.toolbox import listfile
 
 def arguments():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("npzlist", type=Path, help="Listfile of npzs")
+    parser.add_argument("listfile", type=Path, help="Domain list")
+    parser.add_argument("input_dir", type=Path, help="Input directory")
     parser.add_argument("output_npz", type=Path, help="final npz output path")
-    parser.add_argument("output_tsv", type=Path, help="output tsv with timing info")
     return parser.parse_args()
 
 
@@ -48,7 +48,6 @@ if __name__ == '__main__':
             final_mat[1, i, :] = npz['graph_gdvs'][1, :]
 
             prot_id = protein_keys[i]
-            _, _, elapsed = npz['timing']
             if 'node_GDV' in npz.files:
                 length = npz['node_GDV'].shape[0]
             elif 'length' in npz.files:
