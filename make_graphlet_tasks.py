@@ -6,7 +6,7 @@ from pathlib import Path
 
 from toolbox import listfile
 
-script = ( Path(__file__).parent / "calc_graphlets.py" ).resolve().absolute()
+script = ( Path(__file__).parent / "count_graphlets.py" ).resolve().absolute()
 
 def arguments():
     parser = argparse.ArgumentParser(description="generate disBatch taskfile for graphlets")
