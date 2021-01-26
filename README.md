@@ -1,5 +1,5 @@
 # graphletcounts
-Wrappers and scripts for counting (protein structure) graphlets. For calculating graphlets at scale, we have been parallelizing via DisBatch.
+Wrappers and scripts for counting (protein structure) graphlets. For calculating graphlets at scale, we have been parallelizing via <a href="https://github.com/flatironinstitute/disBatch">DisBatch</a>.
 
 # Installation
 ```bash
