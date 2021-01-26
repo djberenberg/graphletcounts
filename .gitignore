@@ -1,6 +1,6 @@
 *.swp
 __pycache__
-
 *.py[cx]
 
 venv/
+*.tsk

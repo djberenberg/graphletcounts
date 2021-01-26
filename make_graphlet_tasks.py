@@ -4,7 +4,7 @@
 import argparse
 from pathlib import Path
 
-from toolbox import listfile
+from graphlet_helper.toolbox import listfile
 
 script = ( Path(__file__).parent / "count_graphlets.py" ).resolve().absolute()
 
@@ -14,7 +14,7 @@ def arguments():
     parser.add_argument("input_dir", type=Path, help="Directory to look for IDs")
     parser.add_argument("output_dir", type=Path, help="Directory to place individual files")
     parser.add_argument("-mode", choices=['grafene', 'orca'], default='orca')
-    parser.add_argument("-t", type=int, default=6, help="Contact map threshold")
+    parser.add_argument("-t", type=int, default=10, help="Contact map threshold")
     return parser.parse_args()
 
 if __name__ == '__main__':
