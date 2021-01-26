@@ -125,6 +125,10 @@ class AdjacencyMatrixMaker(object):
     def convert(self, distance_map):
         A = distance_map.clone()
         A = ( A <= self._threshold ).float()
+        if not self._selfloop:
+            n = A.shape[0]
+            mask = torch.eye(n).bool()
+            A.masked_fill_(mask, 0)
         return A
 
     def __call__(self, distance_map):
@@ -142,12 +146,12 @@ class CoordLoader(object):
         """
         self.silent_if_square = silent_if_square
 
-    def convert(self, coordmat):
-        shape = coordmat.shape
+    def convert(self, coords):
+        shape = coords.shape
         assert len(shape) == 2 
         
         if (shape[0] == shape[1]) and self.silent_if_square:
-            return coordmat # do nothing when the input is already a square matrix
+            return coords # do nothing when the input is already a square matrix
         else:
             assert shape[1] == 3
             return torch.cdist(coords, coords, p=2)

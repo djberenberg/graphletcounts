@@ -1,6 +1,8 @@
 *.swp
 __pycache__
 *.py[cx]
+*.log
+*.out
 
 venv/
 

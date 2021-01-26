@@ -127,7 +127,7 @@ class GRAFENERunner(object):
 
         timer.stop()
         return dict(channels=['raw', 'normed'],
-                    mat=np.concatenate([padded[None, ...], normed_vectors[None, ...]]),
+                    mat=np.concatenate([padded[None, ...], normed_vector[None, ...]]),
                     protein=stem,
                     )
 

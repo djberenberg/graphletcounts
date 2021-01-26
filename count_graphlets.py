@@ -41,4 +41,4 @@ if __name__ == '__main__':
     result = runner.run(infile)
     print("Saving now") 
     np.savez_compressed(outfile, **result)
-    Print("Complete")
+    print("complete")
