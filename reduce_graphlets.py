@@ -46,5 +46,5 @@ if __name__ == '__main__':
         print(f"\r{80 * ' '}\rfilling ({i}/{N}, {d}) graphlet count mat", end='', flush=True)
 
     print(f"\nSaving to {args.output_npz}")
-    np.savez_compressed(args.output_npz, proteins=proteins, channels=channels, features=final)
+    np.savez_compressed(args.output_npz, proteins=proteins, channels=channels, mat=final)
 
