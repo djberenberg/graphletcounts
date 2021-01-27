@@ -33,7 +33,7 @@ if __name__ == '__main__':
     N = len(proteins)
     nc, d = get_shape(args.input_dir / f"{proteins[0]}.npz")
         
-    final = np.zeros(nc, N, d)
+    final = np.zeros((nc, N, d))
     for i, protein in enumerate(proteins):
         npz = args.input_dir / f"{protein}.npz"
         data = np.load(npz)
@@ -45,6 +45,6 @@ if __name__ == '__main__':
 
         print(f"\r{80 * ' '}\rfilling ({i}/{N}, {d}) graphlet count mat", end='', flush=True)
 
-    print(f"Saving to {args.output_npz}")
+    print(f"\nSaving to {args.output_npz}")
     np.savez_compressed(args.output_npz, proteins=proteins, channels=channels, features=final)
 
