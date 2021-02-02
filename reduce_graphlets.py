@@ -15,7 +15,7 @@ def arguments():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("listfile", type=Path, help="Domain list")
     parser.add_argument("input_dir", type=Path, help="Input directory")
-    parser.add_argument("output_npz", type=Path, help="final npz output path")
+    parser.add_argument("--output-npz", type=Path, help="final npz output path")
     return parser.parse_args()
 
 def get_shape(filename):
@@ -27,6 +27,10 @@ def get_shape(filename):
 
 if __name__ == '__main__':
     args = arguments()
+    
+    output_npz = args.output_npz
+    if output_npz is None:
+        output_npz = f"{input_dir.stem}.npz" 
 
     proteins = listfile.read(args.listfile)
     
@@ -46,5 +50,5 @@ if __name__ == '__main__':
         print(f"\r{80 * ' '}\rfilling ({i}/{N}, {d}) graphlet count mat", end='', flush=True)
 
     print(f"\nSaving to {args.output_npz}")
-    np.savez_compressed(args.output_npz, proteins=proteins, channels=channels, mat=final)
+    np.savez_compressed(output_npz, proteins=proteins, channels=channels, mat=final)
 
