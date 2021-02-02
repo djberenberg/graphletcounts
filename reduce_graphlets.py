@@ -30,7 +30,7 @@ if __name__ == '__main__':
     
     output_npz = args.output_npz
     if output_npz is None:
-        output_npz = f"{input_dir.stem}.npz" 
+        output_npz = f"{args.input_dir.stem}.npz" 
 
     proteins = listfile.read(args.listfile)
     
