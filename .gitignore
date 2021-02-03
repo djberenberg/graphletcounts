@@ -3,6 +3,7 @@ __pycache__
 *.py[cx]
 *.log
 *.out
+*.npz
 
 venv/
 data/

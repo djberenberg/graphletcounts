@@ -8,9 +8,9 @@ from pathlib import Path
 import torch
 import numpy as np
 
-from graphlet_helper import ORCARunner, GRAFENERunner
+from graphlet_helper import ORCARunner, GRAFENERunner, CliqueRunner
 
-modemaker = {'orca': ORCARunner, 'grafene': GRAFENERunner}
+modemaker = {'orca': ORCARunner, 'grafene': GRAFENERunner, 'clique': CliqueRunner}
 
 def check_exists(filename):
     filename = Path(filename)
