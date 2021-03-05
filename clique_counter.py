@@ -30,7 +30,10 @@ if __name__ == "__main__":
     nc = 2
     mat = None
     for i, protein in enumerate(proteins):
-        result = runner.run(args.input_dir / f"{protein}.pt")
+        try:
+            result = runner.run(args.input_dir / f"{protein}.pt")
+        except FileNotFoundError:
+            continue
         features = result['mat']
         if mat is None:
             nc, d = features.shape
